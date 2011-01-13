@@ -1,1 +1,14 @@
 卒論を数えるなにか
+
+USAGE:
+ ruby wc.rb --no-message [--dir=DIRECTRY]
+ 文字数だけ表示
+
+ ruby wc.rb [--dir=DIRECTRY] [options]
+ そのままTwitterに流せそうなメッセージを表示
+ options:
+ --username=USERNAME
+ --no-limit
+ --no-tags
+ --no-user
+
