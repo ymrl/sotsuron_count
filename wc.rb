@@ -1,0 +1,70 @@
+#!/home/ymrl/.rvm/rubies/ruby-1.9.2-p0/bin/ruby
+# coding: utf-8
+$KCODE = "UTF-8" if RUBY_VERSION < '1.9'
+
+require 'kconv'
+require 'time'
+
+def remain deadline=Time.local(2011,1,19,23,59,59)
+  sec = deadline - Time.now
+  return "(締切りまであと#{(sec/(24*60*60)).to_i}日#{((sec%(24*60*60))/(60*60)).to_i}時間#{(((sec%(24*60*60))%(60*60))/60).to_i}分)"
+end
+
+username = ENV['USER']
+no_message = false
+no_limit = false
+no_tags = false
+
+ARGV.each do |arg|
+  if arg =~ /--dir=(.*)/
+    Dir.chdir(File.expand_path($1))
+  elsif arg =~ /--username=(.*)/
+    if $1.length == 0
+      username = nil
+    else
+      username=$1
+    end
+  elsif arg == "--no-message"
+    no_message = true
+  elsif arg == "--no-limit"
+    no_limit = true
+  elsif arg == "--no-tags"
+    no_tags = true
+  elsif arg == "--no-user"
+    username = nil
+  end
+end
+
+
+c = 0
+Dir::glob("*").each do |f|
+  if f =~/^\d\d.*\.tex$/
+    File.open(f,'r') do |t|
+      while l = t.gets
+        m = Kconv.kconv(l,Kconv::UTF8,Kconv::EUC)
+        next if m =~ /^%/
+        m.gsub!(/^\\[a-z\*]+\{(.*)\}$/){$1}
+        m.gsub!(/^\\[a-z\*\s]/,'')
+        m.gsub!(/^\\begin\{.*\}$/,'')
+        m.gsub!(/^\\end\{.*\}$/,'')
+        m.gsub!(/[\t\r\n]/,'')
+        c += m.split(//).length
+      end
+    end
+  end
+end
+
+
+if no_message
+  puts c
+else
+  message = "現在の"
+  message += username+"さんの" if username
+  message += "卒論の文字数は約#{c}文字です"
+  message += " #{remain}" unless no_limit
+  message += " #sfcdogeza #sfchametsu" unless no_tags
+  puts message
+end
+  
+
+
