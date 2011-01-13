@@ -14,6 +14,7 @@ username = ENV['USER']
 no_message = false
 no_limit = false
 no_tags = false
+debug = false
 
 ARGV.each do |arg|
   if arg =~ /--dir=(.*)/
@@ -32,6 +33,8 @@ ARGV.each do |arg|
     no_tags = true
   elsif arg == "--no-user"
     username = nil
+  elsif arg == "--debug"
+    debug = true
   end
 end
 
@@ -43,11 +46,23 @@ Dir::glob("*").each do |f|
       while l = t.gets
         m = Kconv.kconv(l,Kconv::UTF8,Kconv::EUC)
         next if m =~ /^%/
-        m.gsub!(/^\\[a-z\*]+\{(.*)\}$/){$1}
-        m.gsub!(/^\\[a-z\*\s]/,'')
-        m.gsub!(/^\\begin\{.*\}$/,'')
-        m.gsub!(/^\\end\{.*\}$/,'')
+        m.gsub!(/^\s*\\begin\{.*\}$/,'')
+        m.gsub!(/^\s*\\end\{.*\}$/,'')
+        m.gsub!(/^\s*\\label\{.*\}$/,'')
+        m.gsub!(/^\s*\\usepackage\{.*\}$/,'')
+        m.gsub!(/^\s*\\includegraphics(?:\[.*\])*\{.*\}$/,'')
+        m.gsub!(/^\s*\\item\[(.*)\]\s?(.*)$/){$1+' '+$2}
+        m.gsub!(/^\s*\\item\s(.*)$/){$1}
+        m.gsub!(/^\s*\\[a-z\*]+\[(.*)\]$/){$1}
+        m.gsub!(/^\s*\\[a-z\*]+(?:(?:\[.*\])|(?:\{.*\}))*\{(.*)\}$/){$1}
+        m.gsub!(/\\~\{\}/,'~')
+        m.gsub!(/\\slash\s?/,'/')
+        m.gsub!(/\\\\/,'\\')
+        m.gsub!(/\\([\#$%$&^_{}])/){$1}
+        m.gsub!(/\\[a-z]+(?:\{[^}]*\})+?/,'')
+        m.gsub!(/\\[a-z]+\s+/,'')
         m.gsub!(/[\t\r\n]/,'')
+        puts m if debug
         c += m.split(//).length
       end
     end
