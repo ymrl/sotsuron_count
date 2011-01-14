@@ -4,6 +4,7 @@ $KCODE = "UTF-8" if RUBY_VERSION < '1.9'
 
 require 'kconv'
 require 'time'
+require 'net/http'
 
 def remain deadline=Time.local(2011,1,19,23,59,59)
   sec = deadline - Time.now
@@ -14,6 +15,7 @@ username = ENV['USER']
 no_message = false
 no_limit = false
 no_tags = false
+saykana = false
 debug = false
 
 ARGV.each do |arg|
@@ -35,6 +37,8 @@ ARGV.each do |arg|
     username = nil
   elsif arg == "--debug"
     debug = true
+  elsif arg == "--saykana"
+    saykana = true
   end
 end
 
@@ -79,7 +83,12 @@ else
   message += " #{remain}" unless no_limit
   message += " #sfcdogeza #sfchametsu" unless no_tags
   puts message
+  if saykana
+    Net::HTTP.start('masui.sfc.keio.ac.jp',80) do |http|
+      request = Net::HTTP::Post.new('/say/say')
+      request.set_form_data :message=>message
+      http.request(request)
+    end
+  end
 end
   
-
-
