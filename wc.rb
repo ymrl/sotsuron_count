@@ -77,16 +77,16 @@ end
 if no_message
   puts c
 else
-  message = "現在の"
-  message += username+"さんの" if username
-  message += "卒論の文字数は約#{c}文字です"
-  message += " #{remain}" unless no_limit
+  message_core = "現在の"
+  message_core += username+"さんの" if username
+  message_core += "卒論の文字数は約#{c}文字です"
+  message = message_core + " #{remain}" unless no_limit
   message += " #sfcdogeza #sfchametsu" unless no_tags
   puts message
   if saykana
     Net::HTTP.start('masui.sfc.keio.ac.jp',80) do |http|
       request = Net::HTTP::Post.new('/say/say')
-      request.set_form_data :message=>message
+      request.set_form_data :message=>message_core
       http.request(request)
     end
   end
