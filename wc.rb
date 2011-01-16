@@ -45,7 +45,7 @@ end
 
 c = 0
 Dir::glob("*").each do |f|
-  if f =~/^\d\d.*\.tex$/
+  if f =~/^.*\.tex$/
     File.open(f,'r') do |t|
       while l = t.gets
         m = Kconv.kconv(l,Kconv::UTF8)
