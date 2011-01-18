@@ -17,6 +17,7 @@ no_limit = false
 no_tags = false
 saykana = false
 debug = false
+slash = false
 
 ARGV.each do |arg|
   if arg =~ /--dir=(.*)/
@@ -39,6 +40,8 @@ ARGV.each do |arg|
     debug = true
   elsif arg == "--saykana"
     saykana = true
+  elsif arg == "--kensaku-yoke"
+    slash = true
   end
 end
 
@@ -82,6 +85,9 @@ else
   message_core += "卒論の文字数は約#{c}文字です"
   message = message_core + " #{remain}" unless no_limit
   message += " #sfcdogeza #sfchametsu" unless no_tags
+  if slash
+    message = message.split(//).join('/')
+  end
   puts message
   if saykana
     Net::HTTP.start('masui.sfc.keio.ac.jp',80) do |http|
